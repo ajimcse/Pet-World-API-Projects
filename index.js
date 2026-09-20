@@ -1,15 +1,22 @@
-// banner button
+// =========================
+// Banner Button / Categories
+// =========================
+
 const loadButton = () => {
     fetch('https://openapi.programming-hero.com/api/peddy/categories')
         .then(res => res.json())
         .then(data => displayButton(data.categories))
         .catch(error => console.log(error));
-}
+};
+
 const displayButton = (btns) => {
-    console.log(btns)
-    const buttonContainer= document.getElementById('banner-button')
+
+    const buttonContainer = document.getElementById('banner-button');
+
     btns.forEach((btn) => {
+
         const button = document.createElement('button');
+
         button.innerHTML = `
             <img 
                 class="w-10 h-10 rounded-full"
@@ -20,28 +27,58 @@ const displayButton = (btns) => {
             <span>${btn.category}</span>
         `;
 
-        button.className = `
-            flex items-center gap-3
-            border p-3 rounded-lg
-        `;
-      buttonContainer.appendChild(button)
+        button.className =
+            "flex items-center gap-3 border p-3 rounded-lg";
 
-    })
-}
-loadButton()
+        button.addEventListener('click', () => {
 
+            // আগে সব button থেকে active class remove
+            const allButtons = buttonContainer.querySelectorAll('button');
 
+            allButtons.forEach((btn) => {
+                btn.classList.remove('bg-slate-300', 'text-white');
+            });
 
-// banner section
-const loadPets = () => {
-    fetch('https://openapi.programming-hero.com/api/peddy/pets')
+            // যেটাতে click করেছি সেটাতে active class
+            button.classList.add('bg-slate-300', );
+
+            // category অনুযায়ী pet load
+            loadPets(btn.category);
+        });
+
+        buttonContainer.appendChild(button);
+    });
+};
+
+// =========================
+// Load Pets
+// =========================
+
+const loadPets = (category) => {
+
+    let url = 'https://openapi.programming-hero.com/api/peddy/pets';
+
+    // যদি category থাকে
+    if (category) {
+        url = `https://openapi.programming-hero.com/api/peddy/category/${category}`;
+    }
+
+    fetch(url)
         .then(res => res.json())
         .then(data => {
-            displayPets(data.pets);
+
+            // সব pets API এবং category API-এর response handle
+            const pets = data.pets || data.data;
+
+            displayPets(pets);
         })
         .catch(error => console.log(error));
 };
 
+
+// =========================
+// Display Pets
+// =========================
 
 const displayPets = (pets) => {
 
@@ -55,6 +92,7 @@ const displayPets = (pets) => {
 
         card.innerHTML = `
             <div class="card bg-base-100 shadow-xl">
+
                 <figure>
                     <img 
                         src="${pet.image}" 
@@ -69,13 +107,21 @@ const displayPets = (pets) => {
                         ${pet.pet_name}
                     </h2>
 
-                    <p>Breed: ${pet.breed || "Not available"}</p>
+                    <p>
+                        Breed: ${pet.breed || "Not available"}
+                    </p>
 
-                    <p>Category: ${pet.category}</p>
+                    <p>
+                        Category: ${pet.category}
+                    </p>
 
-                    <p>Gender: ${pet.gender || "Not available"}</p>
+                    <p>
+                        Gender: ${pet.gender || "Not available"}
+                    </p>
 
-                    <p>Price: $${pet.price ?? "Not available"}</p>
+                    <p>
+                        Price: $${pet.price ?? "Not available"}
+                    </p>
 
                     <button class="btn btn-primary">
                         Details
@@ -90,4 +136,9 @@ const displayPets = (pets) => {
 };
 
 
+// =========================
+// Initial Load
+// =========================
+
+loadButton();
 loadPets();
